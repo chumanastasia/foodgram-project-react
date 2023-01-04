@@ -32,7 +32,7 @@ services:
 
 
   backend:
-    image: chumanastasia/foodgram_backend:3
+    image: chumanastasia/foodgram_backend:v1.01.2023
     restart: always
     volumes:
       - static_value:/app/static/
