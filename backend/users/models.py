@@ -24,19 +24,18 @@ class User(AbstractUser):
 
 class Subscribe(models.Model):
     """Subscribe model."""
-    user = models.ForeignKey(
-        User,
-        related_name='subscriber',
-        verbose_name="Subscriber",
-        on_delete=models.CASCADE,
-    )
     author = models.ForeignKey(
         User,
         related_name='subscribing',
         verbose_name="Author",
         on_delete=models.CASCADE,
     )
-
+    user = models.ForeignKey(
+        User,
+        related_name='subscriber',
+        verbose_name="Subscriber",
+        on_delete=models.CASCADE,
+    )
     class Meta:
         ordering = ['-id']
         constraints = [

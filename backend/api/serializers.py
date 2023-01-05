@@ -4,13 +4,14 @@ from django.db.models import F
 from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
-from recipes.models import Ingredient, IngredientInRecipe, Recipe, Tag
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import IntegerField, SerializerMethodField
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.serializers import ModelSerializer
+
 from users.models import Subscribe
+from recipes.models import Ingredient, IngredientInRecipe, Recipe, Tag
 
 User = get_user_model()
 
@@ -70,7 +71,8 @@ class SubscribeSerializer(CustomUserSerializer):
             )
         return data
 
-    def get_recipes_count(self, obj):
+    @staticmethod
+    def get_recipes_count(obj):
         return obj.recipes.count()
 
     def get_recipes(self, obj):
@@ -118,7 +120,8 @@ class RecipeReadSerializer(ModelSerializer):
             'cooking_time',
         )
 
-    def get_ingredients(self, obj):
+    @staticmethod
+    def get_ingredients(obj):
         recipe = obj
         ingredients = recipe.ingredients.values(
             'id',
@@ -169,7 +172,8 @@ class RecipeWriteSerializer(ModelSerializer):
             'cooking_time',
         )
 
-    def validate_ingredients(self, value):
+    @staticmethod
+    def validate_ingredients(value):
         ingredients = value
         if not ingredients:
             raise ValidationError({
@@ -189,7 +193,8 @@ class RecipeWriteSerializer(ModelSerializer):
             ingredients_list.append(ingredient)
         return value
 
-    def validate_tags(self, value):
+    @staticmethod
+    def validate_tags(value):
         tags = value
         if not tags:
             raise ValidationError({

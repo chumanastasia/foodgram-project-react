@@ -4,8 +4,6 @@ from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from recipes.models import (Favourite, Ingredient, IngredientInRecipe, Recipe,
-                            ShoppingCart, Tag)
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
@@ -13,8 +11,10 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
+from recipes.models import (Favourite, Ingredient, IngredientInRecipe, Recipe,
+                            ShoppingCart, Tag)
 from .filters import IngredientFilter, RecipeFilter
-from .pagination import CustomPagination
+# from .pagination import CustomPagination
 from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
 from .serializers import (IngredientSerializer, RecipeReadSerializer,
                           RecipeShortSerializer, RecipeWriteSerializer,
@@ -22,6 +22,7 @@ from .serializers import (IngredientSerializer, RecipeReadSerializer,
 
 
 class IngredientViewSet(ReadOnlyModelViewSet):
+    """ ViewSet for Ingredient model """
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = (IsAdminOrReadOnly,)
@@ -30,15 +31,17 @@ class IngredientViewSet(ReadOnlyModelViewSet):
 
 
 class TagViewSet(ReadOnlyModelViewSet):
+    """ ViewSet for Tag model """
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = (IsAdminOrReadOnly,)
 
 
 class RecipeViewSet(ModelViewSet):
+    """ ViewSet for Recipe model """
     queryset = Recipe.objects.all()
     permission_classes = (IsAuthorOrReadOnly | IsAdminOrReadOnly,)
-    pagination_class = CustomPagination
+    # pagination_class = CustomPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
 
@@ -72,16 +75,18 @@ class RecipeViewSet(ModelViewSet):
         else:
             return self.delete_from(ShoppingCart, request.user, pk)
 
-    def add_to(self, model, user, pk):
+    @staticmethod
+    def add_to(model, user, pk):
         if model.objects.filter(user=user, recipe__id=pk).exists():
-            return Response({'errors': 'Рецепт уже добавлен!'},
+            return Response({'errors': 'Recipe already exists!'},
                             status=status.HTTP_400_BAD_REQUEST)
         recipe = get_object_or_404(Recipe, id=pk)
         model.objects.create(user=user, recipe=recipe)
         serializer = RecipeShortSerializer(recipe)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    def delete_from(self, model, user, pk):
+    @staticmethod
+    def delete_from(model, user, pk):
         obj = model.objects.filter(user=user, recipe__id=pk)
         if obj.exists():
             obj.delete()
