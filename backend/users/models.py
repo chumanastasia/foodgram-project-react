@@ -36,6 +36,7 @@ class Subscribe(models.Model):
         verbose_name="Subscriber",
         on_delete=models.CASCADE,
     )
+
     class Meta:
         ordering = ['-id']
         constraints = [
