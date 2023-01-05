@@ -4,12 +4,9 @@ from django.db.models import UniqueConstraint
 
 
 class User(AbstractUser):
+    """User model."""
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = [
-        'username',
-        'first_name',
-        'last_name',
-    ]
+    REQUIRED_FIELDS = ['username']
     email = models.EmailField(
         'email address',
         max_length=254,
@@ -18,24 +15,25 @@ class User(AbstractUser):
 
     class Meta:
         ordering = ['id']
-        verbose_name = 'Пользователь'
-        verbose_name_plural = 'Пользователи'
+        verbose_name = 'User'
+        verbose_name_plural = 'Users'
 
     def __str__(self):
         return self.username
 
 
 class Subscribe(models.Model):
+    """Subscribe model."""
     user = models.ForeignKey(
         User,
         related_name='subscriber',
-        verbose_name="Подписчик",
+        verbose_name="Subscriber",
         on_delete=models.CASCADE,
     )
     author = models.ForeignKey(
         User,
         related_name='subscribing',
-        verbose_name="Автор",
+        verbose_name="Author",
         on_delete=models.CASCADE,
     )
 
@@ -45,5 +43,5 @@ class Subscribe(models.Model):
             UniqueConstraint(fields=['user', 'author'],
                              name='unique_subscription')
         ]
-        verbose_name = 'Подписка'
-        verbose_name_plural = 'Подписки'
+        verbose_name = 'Subscribe'
+        verbose_name_plural = 'Subscribes'
