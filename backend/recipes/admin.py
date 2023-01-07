@@ -27,19 +27,19 @@ class IngredientAdmin(admin.ModelAdmin):
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
-    list_display = ('name', 'color', 'slug',)
+    list_display = ('name', 'color', 'slug')
 
 
 @admin.register(ShoppingCart)
 class ShoppingCartAdmin(admin.ModelAdmin):
-    list_display = ('user', 'recipe',)
-
-
-@admin.register(Favourite)
-class FavouriteAdmin(admin.ModelAdmin):
-    list_display = ('user', 'recipe',)
+    list_display = ('user', 'recipe')
 
 
 @admin.register(IngredientInRecipe)
 class IngredientInRecipeAdmin(admin.ModelAdmin):
-    list_display = ('recipe', 'ingredient', 'amount',)
+    list_display = ('recipe', 'ingredient', 'amount')
+
+
+@admin.register(Favourite)
+class FavouriteAdmin(admin.ModelAdmin):
+    list_display = ('user', 'recipe')

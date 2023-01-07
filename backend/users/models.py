@@ -3,18 +3,21 @@ from django.db import models
 from django.db.models import UniqueConstraint
 
 
+MAX_LENGTH_EMAIL = 254
+
+
 class User(AbstractUser):
     """User model."""
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
+    REQUIRED_FIELDS = ('username',)
     email = models.EmailField(
         'email address',
-        max_length=254,
+        max_length=MAX_LENGTH_EMAIL,
         unique=True,
     )
 
     class Meta:
-        ordering = ['id']
+        ordering = ('id',)
         verbose_name = 'User'
         verbose_name_plural = 'Users'
 
@@ -38,10 +41,11 @@ class Subscribe(models.Model):
     )
 
     class Meta:
-        ordering = ['-id']
+        ordering = ('-id',)
         constraints = [
-            UniqueConstraint(fields=['user', 'author'],
-                             name='unique_subscription')
+            UniqueConstraint(
+                fields=('user', 'author'),
+                name='unique_subscription')
         ]
         verbose_name = 'Subscribe'
         verbose_name_plural = 'Subscribes'

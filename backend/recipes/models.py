@@ -5,11 +5,27 @@ from django.db.models import UniqueConstraint
 
 User = get_user_model()
 
+MAX_LENGTH_NAME_INGREDIENT = 200
+MAX_LENGTH_MEASUREMENT_UNIT_INGREDIENT = 200
+
+MAX_LENGTH_SLUG_TAG = 200
+MAX_LENGTH_NAME_TAG = 200
+MAX_LENGTH_COLOR_TAG = 7
+
+MAX_LENGTH_NAME_RECIPE = 200
+MAX_LENGTH_TEXT_RECIPE = 2000
+
 
 class Ingredient(models.Model):
     """Ingredient model."""
-    name = models.CharField('Name', max_length=200)
-    measurement_unit = models.CharField('Unit of measurement ', max_length=200)
+    name = models.CharField(
+        'Name',
+        max_length=MAX_LENGTH_NAME_INGREDIENT
+    )
+    measurement_unit = models.CharField(
+        'Unit of measurement ',
+        max_length=MAX_LENGTH_MEASUREMENT_UNIT_INGREDIENT
+    )
 
     class Meta:
         verbose_name = 'Ingredient'
@@ -22,12 +38,21 @@ class Ingredient(models.Model):
 
 class Tag(models.Model):
     """Tag model."""
-    name = models.CharField('Name', unique=True, max_length=200)
-    slug = models.SlugField('Unique slag', unique=True, max_length=200)
+    slug = models.SlugField(
+        'Unique slag',
+        unique=True,
+        max_length=MAX_LENGTH_SLUG_TAG
+    )
+    name = models.CharField(
+        'Name',
+        unique=True,
+        max_length=MAX_LENGTH_NAME_TAG
+    )
     color = models.CharField(
         'HEX color',
         unique=True,
-        max_length=7,
+        max_length=MAX_LENGTH_COLOR_TAG,
+        default='#000000',
         validators=[
             RegexValidator(
                 regex='^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$',
@@ -41,12 +66,15 @@ class Tag(models.Model):
         verbose_name_plural = 'Tags'
 
     def __str__(self):
-        return self.name
+        return f'{self.name} color: {self.color}'
 
 
 class Recipe(models.Model):
     """Recipe model."""
-    name = models.CharField('Name', max_length=200)
+    name = models.CharField(
+        'Name',
+        max_length=MAX_LENGTH_NAME_RECIPE
+    )
     author = models.ForeignKey(
         User,
         related_name='recipes',
@@ -54,10 +82,13 @@ class Recipe(models.Model):
         null=True,
         verbose_name='Author'
     )
-    text = models.TextField('Description', max_length=2000)
     image = models.ImageField(
         'Image',
         upload_to='recipes/'
+    )
+    text = models.TextField(
+        'Description',
+        max_length=MAX_LENGTH_TEXT_RECIPE
     )
     cooking_time = models.PositiveSmallIntegerField(
         'Cooking time',

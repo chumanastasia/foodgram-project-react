@@ -5,8 +5,8 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 
-from api.pagination import CustomPagination
 from api.serializers import CustomUserSerializer, SubscribeSerializer
 from .models import Subscribe
 
@@ -17,7 +17,7 @@ class CustomUserViewSet(UserViewSet):
     """User view set."""
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer
-    pagination_class = CustomPagination
+    pagination_class = PageNumberPagination
 
     @action(
         detail=True,
