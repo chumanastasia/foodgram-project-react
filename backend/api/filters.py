@@ -6,15 +6,6 @@ from recipes.models import Ingredient, Recipe, Tag
 User = get_user_model()
 
 
-class IngredientFilter(FilterSet):
-    """Ingredient filter."""
-    name = filters.CharFilter(lookup_expr='startswith')
-
-    class Meta:
-        model = Ingredient
-        fields = ('name',)
-
-
 class RecipeFilter(FilterSet):
     """Recipe filter."""
     tags = filters.ModelMultipleChoiceFilter(
@@ -41,3 +32,12 @@ class RecipeFilter(FilterSet):
         if value and not user.is_anonymous:
             return queryset.filter(shopping_cart__user=user)
         return queryset
+
+
+class IngredientFilter(FilterSet):
+    """Ingredient filter."""
+    name = filters.CharFilter(lookup_expr='startswith')
+
+    class Meta:
+        model = Ingredient
+        fields = ('name',)

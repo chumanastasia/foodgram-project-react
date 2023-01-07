@@ -15,25 +15,8 @@ MAX_LENGTH_COLOR_TAG = 7
 MAX_LENGTH_NAME_RECIPE = 200
 MAX_LENGTH_TEXT_RECIPE = 2000
 
-
-class Ingredient(models.Model):
-    """Ingredient model."""
-    name = models.CharField(
-        'Name',
-        max_length=MAX_LENGTH_NAME_INGREDIENT
-    )
-    measurement_unit = models.CharField(
-        'Unit of measurement ',
-        max_length=MAX_LENGTH_MEASUREMENT_UNIT_INGREDIENT
-    )
-
-    class Meta:
-        verbose_name = 'Ingredient'
-        verbose_name_plural = 'Ingredients'
-        ordering = ['name']
-
-    def __str__(self):
-        return f'{self.name}, {self.measurement_unit}'
+MIN_AMOUNT_INGREDIENT_IN_RECIPE = 1
+MIN_COOKING_TIME_RECIPE = 1
 
 
 class Tag(models.Model):
@@ -69,6 +52,26 @@ class Tag(models.Model):
         return f'{self.name} color: {self.color}'
 
 
+class Ingredient(models.Model):
+    """Ingredient model."""
+    name = models.CharField(
+        'Name',
+        max_length=MAX_LENGTH_NAME_INGREDIENT
+    )
+    measurement_unit = models.CharField(
+        'Unit of measurement ',
+        max_length=MAX_LENGTH_MEASUREMENT_UNIT_INGREDIENT
+    )
+
+    class Meta:
+        verbose_name = 'Ingredient'
+        verbose_name_plural = 'Ingredients'
+        ordering = ['name']
+
+    def __str__(self):
+        return f'{self.name}, {self.measurement_unit}'
+
+
 class Recipe(models.Model):
     """Recipe model."""
     name = models.CharField(
@@ -92,7 +95,10 @@ class Recipe(models.Model):
     )
     cooking_time = models.PositiveSmallIntegerField(
         'Cooking time',
-        validators=[MinValueValidator(1, message='Enter a valid time')]
+        validators=[MinValueValidator(
+            MIN_COOKING_TIME_RECIPE,
+            message='Enter a valid time'
+        )]
     )
     ingredients = models.ManyToManyField(
         Ingredient,
@@ -130,7 +136,10 @@ class IngredientInRecipe(models.Model):
     )
     amount = models.PositiveSmallIntegerField(
         'Amount',
-        validators=[MinValueValidator(1, message='Enter a valid amount')]
+        validators=[MinValueValidator(
+            MIN_AMOUNT_INGREDIENT_IN_RECIPE,
+            message='Enter a valid amount'
+        )]
     )
 
     class Meta:
@@ -144,8 +153,8 @@ class IngredientInRecipe(models.Model):
         )
 
 
-class Favourite(models.Model):
-    """Favourite model."""
+class Favorite(models.Model):
+    """Favorite model."""
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -160,8 +169,8 @@ class Favourite(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Favourite'
-        verbose_name_plural = 'Favourite'
+        verbose_name = 'Favorite'
+        verbose_name_plural = 'Favorites'
         constraints = [
             UniqueConstraint(fields=['user', 'recipe'],
                              name='unique_favourite')
@@ -171,7 +180,7 @@ class Favourite(models.Model):
         return f'{self.user} add "{self.recipe}" to favourites'
 
 
-class ShoppingCart(models.Model):
+class ShoppingList(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -194,4 +203,4 @@ class ShoppingCart(models.Model):
         ]
 
     def __str__(self):
-        return f'{self.user} add "{self.recipe}" to shopping cart'
+        return f'{self.user} add "{self.recipe}"'

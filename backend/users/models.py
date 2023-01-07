@@ -8,13 +8,14 @@ MAX_LENGTH_EMAIL = 254
 
 class User(AbstractUser):
     """User model."""
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ('username',)
     email = models.EmailField(
         'email address',
         max_length=MAX_LENGTH_EMAIL,
         unique=True,
     )
+
+    REQUIRED_FIELDS = ('username',)
+    USERNAME_FIELD = 'email'
 
     class Meta:
         ordering = ('id',)

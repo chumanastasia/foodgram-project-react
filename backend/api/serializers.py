@@ -175,8 +175,30 @@ class RecipeWriteSerializer(ModelSerializer):
             'cooking_time',
         )
 
+    def representation(self, instance):
+        request = self.context.get('request')
+        context = {'request': request}
+        return RecipeReadSerializer(instance,
+                                    context=context).data
+
     @staticmethod
-    def validate_ingredients(value):
+    def validator_tags(value):
+        tags = value
+        if not tags:
+            raise ValidationError({
+                'tags': 'Add at least one tag'
+            })
+        tags_list = []
+        for tag in tags:
+            if tag in tags_list:
+                raise ValidationError({
+                    'tags': 'Tags must be unique'
+                })
+            tags_list.append(tag)
+        return value
+
+    @staticmethod
+    def validator_ingredients(value):
         ingredients = value
         if not ingredients:
             raise ValidationError({
@@ -196,24 +218,8 @@ class RecipeWriteSerializer(ModelSerializer):
             ingredients_list.append(ingredient)
         return value
 
-    @staticmethod
-    def validate_tags(value):
-        tags = value
-        if not tags:
-            raise ValidationError({
-                'tags': 'Add at least one tag'
-            })
-        tags_list = []
-        for tag in tags:
-            if tag in tags_list:
-                raise ValidationError({
-                    'tags': 'Tags must be unique'
-                })
-            tags_list.append(tag)
-        return value
-
     @transaction.atomic
-    def create_ingredients_amounts(self, ingredients, recipe):
+    def create_quantity_of_ingredients(self, ingredients, recipe):
         IngredientInRecipe.objects.bulk_create(
             [IngredientInRecipe(
                 ingredient=Ingredient.objects.get(id=ingredient['id']),
@@ -228,8 +234,10 @@ class RecipeWriteSerializer(ModelSerializer):
         ingredients = validated_data.pop('ingredients')
         recipe = Recipe.objects.create(**validated_data)
         recipe.tags.set(tags)
-        self.create_ingredients_amounts(recipe=recipe,
-                                        ingredients=ingredients)
+        self.create_quantity_of_ingredients(
+            recipe=recipe,
+            ingredients=ingredients
+        )
         return recipe
 
     @transaction.atomic
@@ -240,16 +248,12 @@ class RecipeWriteSerializer(ModelSerializer):
         instance.tags.clear()
         instance.tags.set(tags)
         instance.ingredients.clear()
-        self.create_ingredients_amounts(recipe=instance,
-                                        ingredients=ingredients)
+        self.create_quantity_of_ingredients(
+            recipe=instance,
+            ingredients=ingredients
+        )
         instance.save()
         return instance
-
-    def to_representation(self, instance):
-        request = self.context.get('request')
-        context = {'request': request}
-        return RecipeReadSerializer(instance,
-                                    context=context).data
 
 
 class RecipeShortSerializer(ModelSerializer):
