@@ -66,7 +66,7 @@ class Ingredient(models.Model):
     class Meta:
         verbose_name = 'Ingredient'
         verbose_name_plural = 'Ingredients'
-        ordering = ['name']
+        ordering = ('name',)
 
     def __str__(self):
         return f'{self.name}, {self.measurement_unit}'
@@ -113,7 +113,7 @@ class Recipe(models.Model):
     )
 
     class Meta:
-        ordering = ['-id']
+        ordering = ('-id',)
         verbose_name = 'Recipe'
         verbose_name_plural = 'Recipes'
 
