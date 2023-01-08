@@ -8,6 +8,7 @@ from rest_framework.response import Response
 
 from api.serializers import CustomUserSerializer, SubscribeSerializer
 from .models import Subscribe
+from api.paginators import CustomPagination
 
 User = get_user_model()
 
@@ -16,6 +17,7 @@ class CustomUserViewSet(UserViewSet):
     """User view set."""
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer
+    pagination_class = CustomPagination
 
     @action(
         detail=False,

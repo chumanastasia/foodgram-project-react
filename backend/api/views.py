@@ -15,13 +15,7 @@ from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
 from .serializers import (IngredientSerializer, RecipeReadSerializer,
                           RecipeShortSerializer, RecipeWriteSerializer,
                           TagSerializer)
-
-
-class TagViewSet(ReadOnlyModelViewSet):
-    """ ViewSet for Tag model """
-    queryset = Tag.objects.all()
-    serializer_class = TagSerializer
-    permission_classes = (IsAdminOrReadOnly,)
+from .paginators import CustomPagination
 
 
 class IngredientViewSet(ReadOnlyModelViewSet):
@@ -33,12 +27,20 @@ class IngredientViewSet(ReadOnlyModelViewSet):
     filterset_class = IngredientFilter
 
 
+class TagViewSet(ReadOnlyModelViewSet):
+    """ ViewSet for Tag model """
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+    permission_classes = (IsAdminOrReadOnly,)
+
+
 class RecipeViewSet(ModelViewSet):
     """ ViewSet for Recipe model """
     queryset = Recipe.objects.all()
     permission_classes = (IsAuthorOrReadOnly | IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
+    pagination_class = CustomPagination
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
