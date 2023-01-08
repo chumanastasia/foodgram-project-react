@@ -16,15 +16,6 @@ from recipes.models import Ingredient, IngredientInRecipe, Recipe, Tag
 User = get_user_model()
 
 
-class CustomUserCreateSerializer(UserCreateSerializer):
-    class Meta:
-        model = User
-        fields = tuple(User.REQUIRED_FIELDS) + (
-            User.USERNAME_FIELD,
-            'password',
-        )
-
-
 class CustomUserSerializer(UserSerializer):
     is_subscribed = SerializerMethodField(read_only=True)
 
@@ -44,6 +35,15 @@ class CustomUserSerializer(UserSerializer):
         if user.is_anonymous:
             return False
         return Subscribe.objects.filter(user=user, author=obj).exists()
+
+
+class CustomUserCreateSerializer(UserCreateSerializer):
+    class Meta:
+        model = User
+        fields = tuple(User.REQUIRED_FIELDS) + (
+            User.USERNAME_FIELD,
+            'password',
+        )
 
 
 class SubscribeSerializer(CustomUserSerializer):
@@ -229,18 +229,6 @@ class RecipeWriteSerializer(ModelSerializer):
         )
 
     @transaction.atomic
-    def create(self, validated_data):
-        tags = validated_data.pop('tags')
-        ingredients = validated_data.pop('ingredients')
-        recipe = Recipe.objects.create(**validated_data)
-        recipe.tags.set(tags)
-        self.create_quantity_of_ingredients(
-            recipe=recipe,
-            ingredients=ingredients
-        )
-        return recipe
-
-    @transaction.atomic
     def update(self, instance, validated_data):
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
@@ -254,6 +242,18 @@ class RecipeWriteSerializer(ModelSerializer):
         )
         instance.save()
         return instance
+
+    @transaction.atomic
+    def create(self, validated_data):
+        tags = validated_data.pop('tags')
+        ingredients = validated_data.pop('ingredients')
+        recipe = Recipe.objects.create(**validated_data)
+        recipe.tags.set(tags)
+        self.create_quantity_of_ingredients(
+            recipe=recipe,
+            ingredients=ingredients
+        )
+        return recipe
 
 
 class RecipeShortSerializer(ModelSerializer):
