@@ -11,7 +11,7 @@ services:
     ports:
       - "5432:5432"
   backend:
-    image: chumanastasia/foodgram_backend:v1.01.2023
+    image: chumanastasia/foodgram_backend:v3.01.2023
     restart: always
     volumes:
       - static_value:/app/static/
