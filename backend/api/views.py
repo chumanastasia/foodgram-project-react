@@ -1,6 +1,9 @@
 from django.db.models import Sum
 from django.http import HttpResponse
+from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
+from djoser.views import UserViewSet
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from rest_framework.decorators import action
@@ -8,14 +11,70 @@ from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
-from recipes.models import (Favorite, Ingredient, IngredientInRecipe, Recipe,
-                            ShoppingList, Tag)
+from recipes.models import (
+    Favorite, Ingredient, IngredientInRecipe, Recipe, ShoppingList, Tag
+)
+from users.models import Subscribe
 from .filters import IngredientFilter, RecipeFilter
 from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
-from .serializers import (IngredientSerializer, RecipeReadSerializer,
-                          RecipeShortSerializer, RecipeWriteSerializer,
-                          TagSerializer)
+from .serializers import (
+    IngredientSerializer, RecipeReadSerializer, RecipeShortSerializer,
+    RecipeWriteSerializer, TagSerializer, CustomUserSerializer,
+    SubscribeSerializer
+)
 from .paginators import CustomPagination
+from .services import generate_shopping_list
+
+
+User = get_user_model()
+
+
+class CustomUserViewSet(UserViewSet):
+    """User view set."""
+    queryset = User.objects.all()
+    serializer_class = CustomUserSerializer
+    pagination_class = CustomPagination
+
+    @action(
+        detail=False,
+        permission_classes=[IsAuthenticated]
+    )
+    def subscriptions(self, request):
+        user = request.user
+        queryset = User.objects.filter(subscribing__user=user)
+        pages = self.paginate_queryset(queryset)
+        serializer = SubscribeSerializer(
+            pages,
+            many=True,
+            context={'request': request}
+        )
+        return self.get_paginated_response(serializer.data)
+
+    @action(
+        detail=True,
+        methods=['post', 'delete'],
+        permission_classes=[IsAuthenticated]
+    )
+    def subscribe(self, request, **kwargs):
+        user = request.user
+        author_id = self.kwargs.get('id')
+        author = get_object_or_404(User, id=author_id)
+
+        if request.method == 'POST':
+            serializer = SubscribeSerializer(
+                author,
+                data=request.data,
+                context={'request': request}
+            )
+            serializer.is_valid(raise_exception=True)
+            Subscribe.objects.create(user=user, author=author)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        subscription = get_object_or_404(Subscribe,
+                                         user=user,
+                                         author=author)
+        subscription.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class IngredientViewSet(ReadOnlyModelViewSet):
@@ -104,15 +163,8 @@ class RecipeViewSet(ModelViewSet):
             'ingredient__measurement_unit'
         ).annotate(amount=Sum('amount'))
 
-        for_user = f'Shopping list for: {user.get_full_name()}\n\n'
-        shopping_list = '\n'.join([
-            f'- {ingredient["ingredient__name"]} '
-            f'({ingredient["ingredient__measurement_unit"]})'
-            f' - {ingredient["amount"]}'
-            for ingredient in ingredients
-        ])
-        shopping_cart = for_user + shopping_list
-        filename = 'shopping_list.txt'
+        shopping_cart = generate_shopping_list(user, ingredients)
+        filename = settings.FILE_SHOPPING_LIST
         response = HttpResponse(shopping_cart, content_type='text/plain')
         response['Content-Disposition'] = f'attachment; filename={filename}'
 

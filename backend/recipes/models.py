@@ -5,36 +5,23 @@ from django.db.models import UniqueConstraint
 
 User = get_user_model()
 
-MAX_LENGTH_NAME_INGREDIENT = 200
-MAX_LENGTH_MEASUREMENT_UNIT_INGREDIENT = 200
-
-MAX_LENGTH_SLUG_TAG = 200
-MAX_LENGTH_NAME_TAG = 200
-MAX_LENGTH_COLOR_TAG = 7
-
-MAX_LENGTH_NAME_RECIPE = 200
-MAX_LENGTH_TEXT_RECIPE = 2000
-
-MIN_AMOUNT_INGREDIENT_IN_RECIPE = 1
-MIN_COOKING_TIME_RECIPE = 1
-
 
 class Tag(models.Model):
     """Tag model."""
     slug = models.SlugField(
         'Unique slag',
         unique=True,
-        max_length=MAX_LENGTH_SLUG_TAG
+        max_length=200
     )
     name = models.CharField(
         'Name',
         unique=True,
-        max_length=MAX_LENGTH_NAME_TAG
+        max_length=200
     )
     color = models.CharField(
         'HEX color',
         unique=True,
-        max_length=MAX_LENGTH_COLOR_TAG,
+        max_length=7,
         default='#000000',
         validators=[
             RegexValidator(
@@ -56,11 +43,11 @@ class Ingredient(models.Model):
     """Ingredient model."""
     name = models.CharField(
         'Name',
-        max_length=MAX_LENGTH_NAME_INGREDIENT
+        max_length=200
     )
     measurement_unit = models.CharField(
         'Unit of measurement ',
-        max_length=MAX_LENGTH_MEASUREMENT_UNIT_INGREDIENT
+        max_length=200
     )
 
     class Meta:
@@ -76,7 +63,7 @@ class Recipe(models.Model):
     """Recipe model."""
     name = models.CharField(
         'Name',
-        max_length=MAX_LENGTH_NAME_RECIPE
+        max_length=200
     )
     author = models.ForeignKey(
         User,
@@ -91,12 +78,12 @@ class Recipe(models.Model):
     )
     text = models.TextField(
         'Description',
-        max_length=MAX_LENGTH_TEXT_RECIPE
+        max_length=2000
     )
     cooking_time = models.PositiveSmallIntegerField(
         'Cooking time',
         validators=[MinValueValidator(
-            MIN_COOKING_TIME_RECIPE,
+            1,
             message='Enter a valid time'
         )]
     )
@@ -137,7 +124,7 @@ class IngredientInRecipe(models.Model):
     amount = models.PositiveSmallIntegerField(
         'Amount',
         validators=[MinValueValidator(
-            MIN_AMOUNT_INGREDIENT_IN_RECIPE,
+            1,
             message='Enter a valid amount'
         )]
     )

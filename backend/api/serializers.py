@@ -182,7 +182,7 @@ class RecipeWriteSerializer(ModelSerializer):
                                     context=context).data
 
     @staticmethod
-    def validator_tags(value):
+    def validate_tags(value):
         tags = value
         if not tags:
             raise ValidationError({
@@ -198,7 +198,7 @@ class RecipeWriteSerializer(ModelSerializer):
         return value
 
     @staticmethod
-    def validator_ingredients(value):
+    def validate_ingredients(value):
         ingredients = value
         if not ingredients:
             raise ValidationError({
@@ -218,11 +218,12 @@ class RecipeWriteSerializer(ModelSerializer):
             ingredients_list.append(ingredient)
         return value
 
+    @staticmethod
     @transaction.atomic
-    def create_quantity_of_ingredients(self, ingredients, recipe):
+    def _create_quantity_of_ingredients(ingredients, recipe):
         IngredientInRecipe.objects.bulk_create(
             [IngredientInRecipe(
-                ingredient=Ingredient.objects.get(id=ingredient['id']),
+                ingredient=get_object_or_404(Ingredient, id=ingredient['id']),
                 recipe=recipe,
                 amount=ingredient['amount']
             ) for ingredient in ingredients]

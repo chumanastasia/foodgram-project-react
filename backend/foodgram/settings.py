@@ -8,7 +8,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = os.getenv(key='SECRET_KEY')
 
-DEBUG = False
+DEBUG = os.getenv(key='DEBUG')
 
 ALLOWED_HOSTS = ['*']
 
@@ -127,3 +127,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+
+FILE_SHOPPING_LIST = 'shopping_list.txt'

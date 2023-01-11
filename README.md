@@ -27,6 +27,7 @@ POSTGRES_PASSWORD=postgres
 DB_HOST=db
 DB_PORT=5432
 SECRET_KEY=ваш_секретный_ключ
+DEBUG=False
 ```
 В директории, где находится docker-compose.yml, выполнить команду:
 ```commandline

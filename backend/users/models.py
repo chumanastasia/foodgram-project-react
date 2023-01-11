@@ -3,14 +3,11 @@ from django.db import models
 from django.db.models import UniqueConstraint
 
 
-MAX_LENGTH_EMAIL = 254
-
-
 class User(AbstractUser):
     """User model."""
     email = models.EmailField(
         'email address',
-        max_length=MAX_LENGTH_EMAIL,
+        max_length=254,
         unique=True,
     )
 
@@ -35,13 +32,13 @@ class Subscribe(models.Model):
     author = models.ForeignKey(
         User,
         related_name='subscribing',
-        verbose_name="Author",
+        verbose_name='Author',
         on_delete=models.CASCADE,
     )
     user = models.ForeignKey(
         User,
         related_name='subscriber',
-        verbose_name="Subscriber",
+        verbose_name='Subscriber',
         on_delete=models.CASCADE,
     )
 
