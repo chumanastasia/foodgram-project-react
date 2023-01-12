@@ -175,7 +175,7 @@ class RecipeWriteSerializer(ModelSerializer):
             'cooking_time',
         )
 
-    def representation(self, instance):
+    def to_representation(self, instance):
         request = self.context.get('request')
         context = {'request': request}
         return RecipeReadSerializer(instance,
@@ -237,7 +237,7 @@ class RecipeWriteSerializer(ModelSerializer):
         instance.tags.clear()
         instance.tags.set(tags)
         instance.ingredients.clear()
-        self.create_quantity_of_ingredients(
+        self._create_quantity_of_ingredients(
             recipe=instance,
             ingredients=ingredients
         )
@@ -250,7 +250,7 @@ class RecipeWriteSerializer(ModelSerializer):
         ingredients = validated_data.pop('ingredients')
         recipe = Recipe.objects.create(**validated_data)
         recipe.tags.set(tags)
-        self.create_quantity_of_ingredients(
+        self._create_quantity_of_ingredients(
             recipe=recipe,
             ingredients=ingredients
         )
