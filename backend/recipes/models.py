@@ -11,12 +11,12 @@ class Tag(models.Model):
     slug = models.SlugField(
         'Unique slag',
         unique=True,
-        max_length=20
+        max_length=50
     )
     name = models.CharField(
         'Name',
         unique=True,
-        max_length=20
+        max_length=50
     )
     color = models.CharField(
         'HEX color',
@@ -43,11 +43,11 @@ class Ingredient(models.Model):
     """Ingredient model."""
     name = models.CharField(
         'Name',
-        max_length=20
+        max_length=50
     )
     measurement_unit = models.CharField(
         'Unit of measurement ',
-        max_length=20
+        max_length=50
     )
 
     class Meta:
