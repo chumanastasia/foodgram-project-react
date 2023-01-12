@@ -51,3 +51,6 @@ class Subscribe(models.Model):
         ]
         verbose_name = 'Subscribe'
         verbose_name_plural = 'Subscribes'
+
+    def __str__(self):
+        return f'{self.user} subscribe to {self.author}'

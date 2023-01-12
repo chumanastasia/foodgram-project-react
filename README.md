@@ -43,6 +43,10 @@ docker-compose exec backend python manage.py createsuperuser
 ```
 - Собрать статику:
 ```commandline
-docker-compose exec backend python manage.py collectstatic --no-input
+docker-compose exec backend python manage.py collectstatic --noinput
+```
+- Загрузить ингредиенты:
+```commandline
+docker-compose exec backend python manage.py loaddata ingredients.json
 ```
 Теперь проект доступен по адресу http://<ваш_IP_адрес>/ 

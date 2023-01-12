@@ -164,8 +164,7 @@ class RecipeViewSet(ModelViewSet):
         ).annotate(amount=Sum('amount'))
 
         shopping_cart = generate_shopping_list(user, ingredients)
-        filename = settings.FILE_SHOPPING_LIST
         response = HttpResponse(shopping_cart, content_type='text/plain')
-        response['Content-Disposition'] = f'attachment; filename={filename}'
+        response['Content-Disposition'] = f'attachment; filename={settings.FILE_SHOPPING_LIST}'
 
         return response
